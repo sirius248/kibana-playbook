@@ -1,0 +1,54 @@
+- name: add working dir
+  become: yes
+  file:
+    path: "{{ working_dir }}"
+    state: directory
+
+- name: download oauth2_proxy
+  become: yes
+  get_url:
+    url: https://github.com/oauth2-proxy/oauth2-proxy/releases/download/v5.1.0/oauth2_proxy-v5.1.0.linux-amd64.go1.14.tar.gz
+    dest: "{{ working_dir }}/oauth2_proxy-v5.1.0.tar.gz"
+
+- name: Extract oauth2_proxy.tar.gz
+  become: yes
+  unarchive:
+    src: "{{ working_dir }}/oauth2_proxy-v5.1.0.tar.gz"
+    dest: "{{ working_dir }}"
+
+- name: create oauth2_proxy symbolic link
+  become: yes
+  file:
+    src: "{{ working_dir }}/oauth2_proxy-v5.1.0.linux-amd64.go1.14/oauth2_proxy"
+    dest: /usr/local/bin/oauth2_proxy
+    state: link
+
+- name: add /etc/oauth2 dir
+  become: yes
+  file:
+    path: /etc/oauth2_proxy
+    state: directory
+
+- name: create oauth2_proxy config
+  become: yes
+  template:
+    src: templates/oauth2_proxy.cfg
+    dest: /etc/oauth2_proxy/oauth2_proxy.cfg
+
+- name: create oauth2_proxy service
+  become: yes
+  template:
+    src: templates/oauth2_proxy.service
+    dest: /etc/systemd/system/oauth2_proxy.service
+
+- name: create oauth2_proxy service
+  become: yes
+  template:
+    src: templates/oauth2_proxy.service
+    dest: /etc/systemd/system/oauth2_proxy.service
+
+- name: Restart oauth2_proxy service
+  become: yes
+  systemd:
+    state: restarted
+    name: oauth2_proxy

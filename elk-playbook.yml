@@ -1,0 +1,9 @@
+---
+-
+  connection: local
+  hosts: localhost
+
+  roles:
+    - oauth2_proxy
+    - nginx
+    - elk

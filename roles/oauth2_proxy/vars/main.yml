@@ -1,0 +1,6 @@
+---
+google_client_id: "{{ lookup('env', 'GOOGLE_CLIENT_ID') }}"
+google_client_secret: "{{ lookup('env', 'GOOGLE_CLIENT_SECRET') }}"
+email_domain_1: "{{ lookup('env', 'EMAIL_DOMAIN_1') }}"
+email_domain_2: "{{ lookup('env', 'EMAIL_DOMAIN_2') }}"
+working_dir: /home/elk-user

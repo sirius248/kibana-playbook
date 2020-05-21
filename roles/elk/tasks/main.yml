@@ -1,0 +1,66 @@
+- name: add working dir
+  become: yes
+  file:
+    path: "{{ working_dir }}"
+    state: directory
+
+- name: clone elk docker repo
+  become: yes
+  git:
+    repo: 'https://github.com/deviantony/docker-elk.git'
+    dest: "{{ working_dir }}"
+    force: true
+
+- name: set configuration for kibana
+  become: yes
+  template:
+    src: templates/kibana/config/kibana.yml
+    dest: "{{ working_dir }}/kibana/config/kibana.yml"
+
+- name: add logtrail dir
+  become: yes
+  file:
+    path: "{{ working_dir }}/kibana/plugins/logtrail"
+    state: directory
+    recurse: yes
+
+- name: add logtrail
+  become: yes
+  template:
+    src: templates/kibana/plugins/logtrail/logtrail.json
+    dest: "{{ working_dir }}/kibana/plugins/logtrail/logtrail.json"
+
+- name: set Dockerfile for kibana
+  become: yes
+  template:
+    src: templates/kibana/Dockerfile
+    dest: "{{ working_dir }}/kibana/Dockerfile"
+
+- name: set configuration for logstash
+  become: yes
+  template:
+    src: templates/logstash/config/logstash.yml
+    dest: "{{ working_dir }}/logstash/config/logstash.yml"
+
+- name: set pipeline for logstash
+  become: yes
+  template:
+    src: templates/logstash/pipeline/logstash.conf
+    dest: "{{ working_dir }}/logstash/pipeline/logstash.conf"
+
+- name: set heap size through docker-compose file
+  become: yes
+  template:
+    src: templates/docker-compose.yml
+    dest: "{{ working_dir }}/docker-compose.yml"
+
+- name: stop current elk service
+  docker_compose:
+    project_src: "{{ working_dir }}"
+    state: absent
+    validate_certs: no
+
+- name: start elk service
+  docker_compose:
+    project_src: "{{ working_dir }}"
+  register: output

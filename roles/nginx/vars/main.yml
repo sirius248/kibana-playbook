@@ -1,0 +1,4 @@
+---
+server_name: "{{ lookup('env','SERVER_NAME') }}"
+nginx_root_dir: /var/www/project
+nginx_web_dir: "{{ nginx_root_dir }}/web"
